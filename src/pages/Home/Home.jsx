@@ -2,6 +2,7 @@ import FeatureItem from '../../components/FeatureItem/FeatureItem'
 import Hero from '../../components/Hero/Hero'
 import '../../css/home.css'
 import { featuresContent } from '../../content/featuresContent'
+import Navbar from '../../components/Navbar/Navbar'
 import Footer from '../../components/Footer/Footer'
 
 /**
@@ -22,14 +23,17 @@ function Home() {
     })
 
     return (
-        <main>
-            <Hero />
-            <section className="features">
-                <h2 className="sr-only">Features</h2>
-                {features}
-            </section>
+        <div className="page">
+            <Navbar />
+            <main>
+                <Hero />
+                <section className="features">
+                    <h2 className="sr-only">Features</h2>
+                    {features}
+                </section>
+            </main>
             <Footer />
-        </main>
+        </div>
     )
 }
 
