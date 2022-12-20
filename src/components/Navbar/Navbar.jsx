@@ -1,6 +1,8 @@
 import logo from '../../assets/argentBankLogo.png'
 import '../../css/navbar.css'
 import { Link } from 'react-router-dom'
+import { logout } from '../../utils/slices/connexion'
+import { useDispatch } from 'react-redux'
 
 /**
  * Component for displaying navbar
@@ -9,6 +11,10 @@ import { Link } from 'react-router-dom'
  * @returns The navbar of the page
  */
 export default function Navbar({ user = null }) {
+    const dispatch = useDispatch()
+    function handleLogOut(event) {
+        dispatch(logout())
+    }
     var menu = (
         <div>
             <Link className="main-nav-item" to="/Login">
@@ -21,14 +27,18 @@ export default function Navbar({ user = null }) {
     if (user) {
         menu = (
             <div>
-                <a className="main-nav-item" href="./user.html">
+                <Link className="main-nav-item" to="/Login">
                     <i className="fa fa-user-circle"></i>
                     {' ' + user}
-                </a>
-                <a className="main-nav-item" href="./index.html">
+                </Link>
+                <Link
+                    onClick={handleLogOut}
+                    className="main-nav-item"
+                    to="/Login"
+                >
                     <i className="fa fa-sign-out"></i>
                     Sign Out
-                </a>
+                </Link>
             </div>
         )
     }

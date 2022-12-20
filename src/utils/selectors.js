@@ -1,0 +1,1 @@
+export const selectConnexion = (state) => state.connexion
