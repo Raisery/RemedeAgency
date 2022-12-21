@@ -1,31 +1,27 @@
 import { createSlice } from '@reduxjs/toolkit';
 import config from '../config.json'
-import { selectConnexion } from '../selectors';
+import { selectUser } from '../selectors';
 
 
-export function fetchOrUpdateToken(username, password, remember) {
-    return async (dispatch, getState) => {
-        const status = selectConnexion(getState()).status
+export function fetchOrUpdateProfile(token) {
+    return async (dispatch, getState ) => {
+        const status = selectUser(getState()).status
         if (status === 'pending' || status === 'updating') {
             return
         }
         dispatch(actions.fetching())
         try {
-            const response = await fetch(config.urlApi+'/user/login', {
+            const response = await fetch(config.urlApi+'/user/profile', {
                 method: 'POST',
                 headers: new Headers({
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        Authorization : 'Bearer '+token
+
                     }),
-                body:JSON.stringify({
-                      email: username,
-                      password: password,
-                  }),
-            })
+                })
             const data = await response.json()
             dispatch(actions.resolved(data))
-            if(remember) {
-                localStorage.setItem('token',data.body.token)
-            }
+            localStorage.setItem('firstName', data.body.firstName)
         } 
         catch (error) {
             dispatch(actions.rejected(error))
@@ -33,24 +29,16 @@ export function fetchOrUpdateToken(username, password, remember) {
     }
 }
 
-export function closeSession() {
-    return async (dispatch, getState) => {
-        dispatch(actions.reset())
-        localStorage.clear()
-    }
-}
-
-export function recoverSession(token) {
-    return async (dispatch, getState) => {
-        dispatch(actions.set(token))
-    }
-}
-
 
 const { actions, reducer } = createSlice({
-    name: 'connexion',
+    name: 'user',
     initialState: {
-        token: '',
+        email: '',
+        firstName: '',
+        lastName: '',
+        createdAt:'',
+        updatedAt:'',
+        id:'',
         error: null,
         status:'void'
     },
@@ -73,7 +61,12 @@ const { actions, reducer } = createSlice({
         },
         resolved: (draft, action) => {
             if (draft.status === 'pending' || draft.status === 'updating') {
-                draft.token = action.payload.body.token
+                draft.email = action.payload.body.email
+                draft.firstName = action.payload.body.firstName
+                draft.lastName = action.payload.body.lastName
+                draft.createdAt = action.payload.body.createdAt
+                draft.updatedAt = action.payload.body.updatedAt
+                draft.id = action.payload.body.id
                 draft.status = 'resolved'
                 return
             }
@@ -86,22 +79,11 @@ const { actions, reducer } = createSlice({
                 return
             }
             return
-        },
-        reset: (draft) => {
-            draft.token = ''
-            draft.status = 'void'
-            draft.error = null
-        },
-        set: (draft, action) => {
-            if(draft.status === 'void') {
-                draft.token = action.payload
-                draft.status = 'resolved'
-                draft.error = null
-            }
-        }        
+        }
     }
 })
 
 export const {fetching, resolved, rejected} = actions
 
 export default reducer
+

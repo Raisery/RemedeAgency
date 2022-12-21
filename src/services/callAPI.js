@@ -1,4 +1,4 @@
-import config from "../content/config.json"
+import config from '../content/config.json'
 
 /**
  * This function should return a token if the user is in the database
@@ -9,7 +9,7 @@ import config from "../content/config.json"
  * 
  * @return token of the user
  */
-export async function login(username, password, setToken) {
+export async function getToken(username, password, setToken) {
     const response = await fetch(config.urlApi+'/user/login', {
         method: 'POST',
         headers: new Headers({

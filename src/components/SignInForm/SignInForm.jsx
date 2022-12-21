@@ -1,10 +1,9 @@
 import '../../css/sign-in-form.css'
-import { useState } from 'react'
 import Loader from '../Loader/Loader'
-import { Navigate } from 'react-router-dom'
-import { login } from '../../utils/slices/connexion'
+import * as connexionActions from '../../utils/slices/connexion'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectConnexion } from '../../utils/selectors'
+import { Navigate } from 'react-router-dom'
 
 /**
  * Component for displaying Sign in form
@@ -12,19 +11,20 @@ import { selectConnexion } from '../../utils/selectors'
  * @returns a Sign in form
  */
 export default function SignInForm() {
-    const [connexion, setConnexion] = useState(false)
     const dispatch = useDispatch()
+    const connexion = useSelector(selectConnexion)
 
-    const { token, error } = useSelector(selectConnexion)
     function handleLogin(event) {
         event.preventDefault()
-        setConnexion(true)
         const fields = document.querySelectorAll('input')
-        dispatch(login(fields[0].value, fields[1].value))
+        dispatch(
+            connexionActions.fetchOrUpdateToken(
+                fields[0].value,
+                fields[1].value,
+                fields[2].checked
+            )
+        )
     }
-    console.log('token: ' + token)
-    console.log('error: ' + error)
-    if (token !== '' && error == null) return <Navigate to="/User" />
 
     const form = (
         <section className="sign-in-content">
@@ -51,5 +51,7 @@ export default function SignInForm() {
         </section>
     )
 
-    return connexion ? <Loader /> : form
+    if (connexion.status === 'resolved') return <Navigate to="/User" />
+
+    return connexion.status === 'fetching' ? <Loader /> : form
 }
