@@ -5,10 +5,8 @@ import { featuresContent } from '../../content/featuresContent'
 import Navbar from '../../components/Navbar/Navbar'
 import Footer from '../../components/Footer/Footer'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectConnexion, selectUser } from '../../utils/selectors'
-import * as userActions from '../../utils/slices/user'
+import { selectConnexion } from '../../utils/selectors'
 import * as connexionActions from '../../utils/slices/connexion'
-import store from '../../utils/store'
 
 /**
  * Component for display home page
@@ -19,15 +17,14 @@ function Home() {
     const dispatch = useDispatch()
     const connexion = useSelector(selectConnexion)
     const token = localStorage.getItem('token')
+    const remember = localStorage.getItem('remember') ? true : false
 
-    if (!token) {
+    if (!remember && connexion.status === 'void') {
         localStorage.clear()
     }
 
-    if (token && connexion.status === 'void') {
-        console.log('set connexion with old token')
-        dispatch(connexionActions.recoverSession(token))
-        console.log('done')
+    if (remember && connexion.status === 'void') {
+        dispatch(connexionActions.recoverSession({ token, remember }))
     }
 
     const features = featuresContent.map((feature, index) => {

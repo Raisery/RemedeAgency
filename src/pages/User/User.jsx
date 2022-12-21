@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectConnexion, selectUser } from '../../utils/selectors'
 import { useEffect } from 'react'
 import * as userActions from '../../utils/slices/user'
+import { Navigate } from 'react-router-dom'
 
 /**
  * Component for display User page
@@ -23,6 +24,19 @@ function User() {
         }
     }, [dispatch, connexion])
 
+    if (connexion.status === 'void') {
+        return <Navigate to="/Login" />
+    }
+
+    if (user.editing) {
+        return <Navigate to="/Edit" />
+    }
+
+    function handleEdit(event) {
+        event.preventDefault()
+        dispatch(userActions.edit(true))
+    }
+
     return (
         <div className="page">
             <Navbar user={user.firstName} />
@@ -33,7 +47,9 @@ function User() {
                         <br />
                         {user.firstName + ' ' + user.lastName}!
                     </h1>
-                    <button className="edit-button">Edit Name</button>
+                    <button onClick={handleEdit} className="edit-button">
+                        Edit Name
+                    </button>
                 </div>
                 <h2 className="sr-only">Accounts</h2>
                 <Account

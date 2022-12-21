@@ -20,14 +20,31 @@ export function fetchOrUpdateProfile(token) {
                     }),
                 })
             const data = await response.json()
-            dispatch(actions.resolved(data))
-            localStorage.setItem('firstName', data.body.firstName)
+            if(data.status === 200) {
+                dispatch(actions.resolved(data))
+                localStorage.setItem('firstName', data.body.firstName)
+            }
+            else dispatch(actions.rejected(data.message))
+            
         } 
         catch (error) {
             dispatch(actions.rejected(error))
         }
     }
 }
+
+export function edit(active) {
+    return async (dispatch, getState) => {
+        dispatch(actions.setEdit(active))
+    }
+}
+
+export function closeSession() {
+    return async (dispatch, getState) => {
+        dispatch(actions.reset())
+    }
+}
+
 
 
 const { actions, reducer } = createSlice({
@@ -39,6 +56,7 @@ const { actions, reducer } = createSlice({
         createdAt:'',
         updatedAt:'',
         id:'',
+        editing: false,
         error: null,
         status:'void'
     },
@@ -79,11 +97,37 @@ const { actions, reducer } = createSlice({
                 return
             }
             return
+        },
+        setEdit: (draft, action) => {
+            draft.editing = action.payload
+            return
+        },
+        reset: (draft) => {
+            draft.email = ''
+            draft.firstName = ''
+            draft.lastName = ''
+            draft.createdAt = ''
+            draft.updatedAt = ''
+            draft.id = ''
+            draft.editing = false
+            draft.status = 'void'
+            return
+        },
+        update: (draft, action) => {
+            draft.email = action.payload.email
+            draft.firstName = action.payload.firstName
+            draft.lastName = action.payload.lastName
+            draft.createdAt = action.payload.createdAt
+            draft.updatedAt = action.payload.updatedAt
+            draft.id = action.payload.id
+            draft.editing = false
+            draft.status = 'resolved'
+            return
         }
     }
 })
 
-export const {fetching, resolved, rejected} = actions
+export const {fetching, resolved, rejected, update} = actions
 
 export default reducer
 

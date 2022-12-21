@@ -22,10 +22,10 @@ export function fetchOrUpdateToken(username, password, remember) {
                   }),
             })
             const data = await response.json()
-            dispatch(actions.resolved(data))
-            if(remember) {
-                localStorage.setItem('token',data.body.token)
-            }
+            data.remember = remember
+            if(data.status === 200) dispatch(actions.resolved(data))
+            else dispatch(actions.rejected(data.message))
+            
         } 
         catch (error) {
             dispatch(actions.rejected(error))
@@ -40,9 +40,9 @@ export function closeSession() {
     }
 }
 
-export function recoverSession(token) {
+export function recoverSession(data) {
     return async (dispatch, getState) => {
-        dispatch(actions.set(token))
+        dispatch(actions.set(data))
     }
 }
 
@@ -51,6 +51,7 @@ const { actions, reducer } = createSlice({
     name: 'connexion',
     initialState: {
         token: '',
+        remember: false,
         error: null,
         status:'void'
     },
@@ -75,6 +76,11 @@ const { actions, reducer } = createSlice({
             if (draft.status === 'pending' || draft.status === 'updating') {
                 draft.token = action.payload.body.token
                 draft.status = 'resolved'
+                draft.remember = action.payload.remember
+                if(draft.remember) {
+                    localStorage.setItem('token', draft.token)
+                    localStorage.setItem('remember', draft.remember)
+                }
                 return
             }
             return
@@ -90,11 +96,13 @@ const { actions, reducer } = createSlice({
         reset: (draft) => {
             draft.token = ''
             draft.status = 'void'
+            draft.remember = false
             draft.error = null
         },
         set: (draft, action) => {
             if(draft.status === 'void') {
-                draft.token = action.payload
+                draft.token = action.payload.token
+                draft.remember = action.payload.remember
                 draft.status = 'resolved'
                 draft.error = null
             }
