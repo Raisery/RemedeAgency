@@ -12,12 +12,19 @@
     }
 
     &-content {
+        position: relative;
         box-sizing: border-box;
         background-color: white;
         width: 500px;
         margin: 0 auto;
         margin-top: 6rem;
         padding: 2rem;
+
+        & .back-button {
+            position: absolute;
+            top: 20px;
+            cursor: pointer;
+        }
     }
 }
 
@@ -45,4 +52,10 @@
             font-size: 1.2rem;
         }
     }
+}
+
+.field-error {
+    color: red;
+    font-size: 12px;
+    font-weight: 600;
 }
