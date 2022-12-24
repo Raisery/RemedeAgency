@@ -76,7 +76,6 @@ export default function EditForm() {
         const lastName = fields[1].value
         const testResult = testEditFields(firstName, lastName, setErrors)
 
-        console.log(testResult)
         if (testResult.length !== 0) return setErrors(testResult)
         editProfile(dispatch, token, firstName, lastName)
     }

@@ -34,7 +34,7 @@ export default function Navbar({ user = null }) {
 
     if (user) {
         menu = (
-            <div>
+            <div className="main-nav-menu">
                 <Link
                     onClick={handleProfile}
                     className="main-nav-item"
